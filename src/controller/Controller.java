@@ -47,17 +47,17 @@ public class Controller extends Observable implements Observer {
     public void handleMovement() {
 
         if(keyH.isDownPressed()){
-            tile.move(0, Game.gravity*2);
+            tile.move(0, Game.GRAVITY *2);
         }
 
         if (keyH.isLeftPressed()) {
             if(!Game.tetrominoCollides(tile, tile.getX()-Game.HOR_VEL, tile.getY())){
-                tile.move(-Game.HOR_VEL, Game.gravity);
+                tile.move(-Game.HOR_VEL, Game.GRAVITY);
             }
         }
         else if (keyH.isRightPressed()) {
             if(!Game.tetrominoCollides(tile, tile.getX()+Game.HOR_VEL, tile.getY())){
-                tile.move(+Game.HOR_VEL, Game.gravity);
+                tile.move(+Game.HOR_VEL, Game.GRAVITY);
             }
         }
 
@@ -72,18 +72,21 @@ public class Controller extends Observable implements Observer {
         else if(keyH.isSpacePressed() && keyH.isSpaceReleased()){
             //hard drop
         }
-
-        if(Game.tetrominoCollides(tile, tile.getX(), tile.getY())) game.updateBoard();
-
         setChanged();
-        notifyObservers();
+        notifyObservers(tile);
     }
 
     //called when the game does stuff (ex end of game)
     @Override
     public void update(Observable o, Object arg) {
-        
+        if (o instanceof Game){
+            if(arg == Game.GameEvent.LEVEL_UP){
+                Tetris.setDropTime(Math.pow((0.8-((game.getLevel()-1)*0.007)),(game.getLevel()-1)));
+                setChanged();
+                notifyObservers(Game.GameEvent.LEVEL_UP);
+            }
 
+        }
     }
 
     public void setTetromino(Tetromino tile) { this.tile = tile; }

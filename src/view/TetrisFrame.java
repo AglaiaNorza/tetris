@@ -1,6 +1,7 @@
 package view;
 
 import model.Game;
+import model.Tetromino;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,10 +19,19 @@ public class TetrisFrame extends JFrame implements Observer {
     protected JPanel panelShower;
     protected CardLayout panelSelection;
 
+    private GamePanel gamePanel;
+
     private TetrisFrame(){
         panelShower = new JPanel();
         panelSelection = new CardLayout();
         panelShower.setLayout(panelSelection);
+
+        gamePanel = new GamePanel();
+
+        panelShower.add(gamePanel, Screen.GAME.name());
+        panelSelection.show(panelShower, Screen.GAME.name());
+        setVisible(true);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
     public static TetrisFrame getInstance(){
@@ -46,8 +56,20 @@ public class TetrisFrame extends JFrame implements Observer {
                     case END -> {
                         switchScreen(Screen.END);
                     }
+
+                    case LEVEL_UP -> {
+
+                    }
+
+                    case BOARD_CHANGE -> {
+                        gamePanel.boardUpdate();
+                    }
                 }
 
+            }
+
+            case Tetromino tile -> {
+                gamePanel.repaint();
             }
 
             default -> {}

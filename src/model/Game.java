@@ -1,5 +1,4 @@
 package model;
-import controller.Controller;
 
 import java.util.Arrays;
 import java.util.Observable;
@@ -9,7 +8,7 @@ import java.util.Observer;
 public class Game extends Observable implements Observer {
 
     public enum GameEvent {
-        INIT, GAME, PAUSE, END, ROW_COMPLETED;
+        INIT, GAME, PAUSE, END, ROW_COMPLETED, LEVEL_UP, BOARD_CHANGE;
     }
 
     private GameEvent state;
@@ -17,9 +16,12 @@ public class Game extends Observable implements Observer {
     private static int[][] board;
     private Tetromino tile;
     private Tetromino preview;
+    private int level;
+
+    private int rowsCleared;
 
     public static final int HOR_VEL = 48;
-    public static int gravity = 48;
+    public static final int GRAVITY = 48;
 
     public Game() {
         this.state = GameEvent.INIT;
@@ -27,10 +29,13 @@ public class Game extends Observable implements Observer {
         board = new int[20][10];
     }
 
-
     public void startGame(){
         tile = new Tetromino();
         preview = new Tetromino(200, 46);
+    }
+
+    public void applyGravity(){
+        tile.move(0, GRAVITY);
     }
 
     /**
@@ -59,8 +64,7 @@ public class Game extends Observable implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof Tetromino) {
-            //might be useless
-            tile = (Tetromino) o;
+            if(Game.tetrominoCollides(tile, tile.getX(), tile.getY())) updateBoard();
         }
 
     }
@@ -78,8 +82,11 @@ public class Game extends Observable implements Observer {
             }
         }
         handleRows();
-        setChanged();
-        notifyObservers();
+
+        if(!hasChanged()) {
+            setChanged();
+            notifyObservers(GameEvent.BOARD_CHANGE);
+        }
     }
 
     /**
@@ -89,9 +96,22 @@ public class Game extends Observable implements Observer {
         for (int i= board.length-1; i>=0; i--){
             if (Arrays.stream(board[i]).noneMatch(num -> num == 0)){
                 Arrays.fill(board[i], 100); // marks them for deletion
+                addClearedRow();
             }
         }
         setChanged();
         notifyObservers(GameEvent.ROW_COMPLETED);
     }
+
+    public void addClearedRow() {
+        rowsCleared++;
+        if(rowsCleared==10){
+            level++;
+            setChanged();
+            notifyObservers(GameEvent.LEVEL_UP);
+            rowsCleared = 0;
+        }
+    }
+
+    public int getLevel() { return level; }
 }
