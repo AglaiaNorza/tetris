@@ -51,10 +51,11 @@ public class Tetromino extends Observable {
     }
 
     public void move(int velX, int velY){
+        System.out.println("moving"+velX);
         y+=velY;
         x+=velX;
         setChanged();
-        notifyObservers();
+        notifyObservers(this);
     }
 
     public int[][] generateRepr(){

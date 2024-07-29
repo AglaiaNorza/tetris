@@ -13,42 +13,31 @@ public class GamePanel extends JPanel {
     private Tetromino tile;
     private int[][] board;
 
-    private boolean updateBoard;
-
-    public GamePanel(){
-        setSize(1280, 600);
-        updateBoard = true;
+    public GamePanel(Tetromino tile){
+        setSize(new Dimension(Tetromino.TILE_SIZE*10, Tetromino.TILE_SIZE*20));
         setBackground(Color.BLUE);
-        System.out.println("creating panel");
-        repaint();
+        this.tile = tile;
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        //if(updateBoard){
-        //    paintBoard(g);
-        //}
-        //paintTile(g);
+        paintBoard(g);
+        paintTile(g);
     }
 
     public void paintBoard(Graphics g) {
 
-
-        updateBoard = false;
     }
 
     public void paintTile(Graphics g){
         Image img = null;
         try{
-            img = ImageIO.read(new File("~/Downloads/tetromino.png"));
+            img = ImageIO.read(new File("/Downloads/tetromino.png"));
         } catch (IOException e) { e.printStackTrace(); }
 
         g.drawImage(img, tile.getX(), tile.getY(), null);
     }
 
-    public void boardUpdate() {
-        updateBoard = true;
-        repaint();
-    }
+    public void setTile(Tetromino tile) { this.tile = tile; }
 }

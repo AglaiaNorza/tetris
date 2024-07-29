@@ -12,6 +12,8 @@ public enum TileShape {
     TileShape(int color){
         this.color = color;
     }
+
+    public int getColor() { return color; }
     
     public static TileShape getRandomShape(){
         return switch ((int)(Math.random() * 6)){

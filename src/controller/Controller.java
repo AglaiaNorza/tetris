@@ -4,6 +4,7 @@ import model.Game;
 import model.Tetromino;
 import view.TetrisFrame;
 
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -12,19 +13,13 @@ public class Controller extends Observable implements Observer {
 
     private static Controller instance;
 
-    private Game game;
+    protected Game game;
     private TetrisFrame frame;
     private KeyHandler keyH;
 
     private Tetromino tile;
 
     private Controller(){
-        game = new Game();
-        frame = TetrisFrame.getInstance();
-
-        game.addObserver(this);
-        addObserver(frame);
-
         keyH = new KeyHandler();
     }
 
@@ -34,7 +29,13 @@ public class Controller extends Observable implements Observer {
     }
 
     public void startGame(){
+        game = new Game();
+        game.addObserver(this);
+        setChanged();
+        notifyObservers(game);
+        Tetris.setPlaying(true);
         game.startGame();
+        TetrisFrame.getInstance().addKeyListener(keyH);
     }
 
     public void pauseGame(){
@@ -42,7 +43,6 @@ public class Controller extends Observable implements Observer {
 
     public void endGame(){
     }
-
 
     public void handleMovement() {
 
@@ -85,7 +85,11 @@ public class Controller extends Observable implements Observer {
                 setChanged();
                 notifyObservers(Game.GameEvent.LEVEL_UP);
             }
-
+            else if(arg instanceof Tetromino){
+                this.tile = (Tetromino)arg;
+                setChanged();
+                notifyObservers(arg);
+            }
         }
     }
 

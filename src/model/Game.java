@@ -27,10 +27,13 @@ public class Game extends Observable implements Observer {
         this.state = GameEvent.INIT;
         this.score = 0;
         board = new int[20][10];
+        tile = new Tetromino();
+        tile.addObserver(this);
     }
 
     public void startGame(){
         tile = new Tetromino();
+        tile.addObserver(this);
         preview = new Tetromino(200, 46);
     }
 
@@ -65,6 +68,8 @@ public class Game extends Observable implements Observer {
     public void update(Observable o, Object arg) {
         if (o instanceof Tetromino) {
             if(Game.tetrominoCollides(tile, tile.getX(), tile.getY())) updateBoard();
+            setChanged();
+            notifyObservers(o);
         }
 
     }
@@ -114,4 +119,6 @@ public class Game extends Observable implements Observer {
     }
 
     public int getLevel() { return level; }
+
+    public Tetromino getTile() { return tile; }
 }

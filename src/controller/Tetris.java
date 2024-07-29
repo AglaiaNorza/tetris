@@ -7,6 +7,7 @@ public class Tetris {
 
     public static long NS_WAIT = 1000000000/60;
     private static double dropTime;
+    private static boolean playing;
 
     public static void main(String[] args) {
         long timeBefore;
@@ -14,25 +15,26 @@ public class Tetris {
         long timeDifference;
         long nsSleep;
 
-        boolean playing = true;
-
-        Game game = new Game();
-        Controller controller = Controller.getInstance();
         TetrisFrame frame = TetrisFrame.getInstance();
+
+        Controller controller = Controller.getInstance();
 
         // starting drop time
         dropTime = 1;
 
         long timeStart = System.nanoTime();
 
-        // create view and wait for the play button
-        game.startGame();
+        while(!playing){
+            try{
+                Thread.sleep(1);
+            }catch(InterruptedException e){e.printStackTrace();}
+        }
 
         while (playing){
             timeBefore = System.nanoTime();
 
             if (System.nanoTime() - timeStart >= dropTime){
-                game.applyGravity();
+                controller.game.applyGravity();
                 timeStart = System.nanoTime();
             }
             timeAfter = System.nanoTime();
@@ -46,5 +48,7 @@ public class Tetris {
     }
 
     public static void setDropTime(double newTime) { dropTime = newTime; }
+
+    public static void setPlaying(boolean p) { playing = p; }
 
 }

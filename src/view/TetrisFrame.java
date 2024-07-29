@@ -1,10 +1,12 @@
 package view;
 
+import controller.Controller;
 import model.Game;
 import model.Tetromino;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyListener;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -19,17 +21,24 @@ public class TetrisFrame extends JFrame implements Observer {
     protected JPanel panelShower;
     protected CardLayout panelSelection;
 
+    private Game game;
+
     private GamePanel gamePanel;
+    private MenuPanel menuPanel;
 
     private TetrisFrame(){
+        setSize(new Dimension(Tetromino.TILE_SIZE*10, Tetromino.TILE_SIZE*20));
         panelShower = new JPanel();
         panelSelection = new CardLayout();
         panelShower.setLayout(panelSelection);
 
-        gamePanel = new GamePanel();
+        Controller.getInstance().addObserver(this);
 
-        panelShower.add(gamePanel, Screen.GAME.name());
-        panelSelection.show(panelShower, Screen.GAME.name());
+        menuPanel = new MenuPanel();
+        panelShower.add(menuPanel, Screen.MENU.name());
+        panelSelection.show(panelShower, Screen.MENU.name());
+
+        add(panelShower);
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
@@ -46,6 +55,16 @@ public class TetrisFrame extends JFrame implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         switch (arg) {
+            // at game start
+            case Game newGame -> {
+                game = newGame;
+
+                gamePanel = new GamePanel(game.getTile());
+
+                panelShower.add(gamePanel, Screen.GAME.name());
+                panelSelection.show(panelShower, Screen.GAME.name());
+            }
+
             case Game.GameEvent event -> {
 
                 switch (event){
@@ -62,19 +81,28 @@ public class TetrisFrame extends JFrame implements Observer {
                     }
 
                     case BOARD_CHANGE -> {
-                        gamePanel.boardUpdate();
+                        gamePanel.repaint();
                     }
                 }
 
             }
 
             case Tetromino tile -> {
+                gamePanel.setTile((Tetromino) arg);
                 gamePanel.repaint();
             }
 
             default -> {}
-
         }
+    }
 
+    @Override
+    public synchronized void addKeyListener(KeyListener l) {
+        gamePanel.addKeyListener(l);
+    }
+
+    public void gameStartClicked() {
+        Controller.getInstance().startGame();
+        gamePanel.requestFocusInWindow();
     }
 }
