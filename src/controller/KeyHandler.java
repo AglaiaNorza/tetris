@@ -43,6 +43,8 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_CONTROL -> controlPressed = true;
         }
         Controller.getInstance().handleMovement();
+
+        upReleased = xReleased = controlReleased = zReleased = false;
     }
 
     /**

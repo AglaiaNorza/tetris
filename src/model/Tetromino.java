@@ -9,28 +9,26 @@ public class Tetromino extends Observable {
         RIGHT, LEFT;
     }
 
-    public static final int SQUARE_SIZE = 4;
-
     private final TileShape shape;
+    private int squareSize;
+    private Rotation rotation;
     private int color;
-    public static final int TILE_SIZE = 48;
+    public static final int TILE_SIZE = 38;
     private int[][] repr;
     private int x,y;
-    //private int velX, velY;
 
     // todo
     //   Tetromino start locations
-    //
     //    The I and O spawn in the middle columns
     //    The rest spawn in the left-middle columns
-    //    The tetriminoes spawn horizontally with J, L and T spawning flat-side first.
     //    Spawn above playfield, row 21 for I, and 21/22 for all other tetriminoes.
-    //    Immediately drop one space if no existing Block is in its path
 
     public Tetromino() {
         this.shape = TileShape.getRandomShape();
+        squareSize = shape.getSquareSize();
         this.color = (int)(Math.random() * 6);
-        y = 0;
+        this.rotation = Rotation.STANDARD;
+        y = -3;
         x = (int) (Math.random()*(7+3)-3);//random spawn x
         repr = generateRepr();
     }
@@ -62,48 +60,41 @@ public class Tetromino extends Observable {
         return switch (shape){
             case O -> new int[][]{
                     {0,0,0,0},
-                    {0,0,0,0},
-                    {0,0,color,color},
-                    {0,0,color,color}
+                    {0,color,color,0},
+                    {0,color,color,0},
+                    {0,0,0,0}
             };
             case I -> new int[][]{
-                    {0,0,0,color},
-                    {0,0,0,color},
-                    {0,0,0,color},
-                    {0,0,0,color}
+                    {0,0,0,0},
+                    {color,color,color,color},
+                    {0,0,0,0},
+                    {0,0,0,0}
             };
             case S -> new int[][]{
-                    {0,0,0,0},
-                    {0,0,0,0},
-                    {0,0,color,color},
-                    {0,color,color,0}
+                    {0,color,color},
+                    {color,color,0},
+                    {0,0,0,}
             };
             case Z -> new int[][]{
-                    {0,0,0,0},
-                    {0,0,0,0},
-                    {0,color,color,0},
-                    {0,0,color,color}
+                    {color,color,0,0},
+                    {0,color,color},
+                    {0,0,0}
             };
             case L -> new int[][]{
-                    {0,0,0,0},
-                    {0,0,color,0},
-                    {0,0,color,0},
-                    {0,0,color,0},
-                    {0,0,color,color}
+                    {0,0,color},
+                    {color,color,color},
+                    {0,0,0}
             };
             case J -> new int[][]{
-                    {0,0,0,color},
-                    {0,0,0,color},
-                    {0,0,0,color},
-                    {0,0,0,color},
-                    {0,0,color,color}
+                    {color,0,0},
+                    {color,color,color},
+                    {0,0,0,0}
             };
 
             case T -> new int[][]{
-                    {0,0,0,0},
-                    {0,0,0,0},
-                    {0,color,color,color},
-                    {0,0,color,0}
+                    {0,color,0},
+                    {color,color, color},
+                    {0,0,0}
             };
         };
     }
@@ -125,6 +116,7 @@ public class Tetromino extends Observable {
 
         if(!Game.tetrominoCollides(new Tetromino(newPosition, x, y, shape), x, y)){
             repr = newPosition;
+            rotation = rotation.getNext(dir);
             setChanged();
             notifyObservers();
             return true;
@@ -142,7 +134,7 @@ public class Tetromino extends Observable {
                 newPosition[i][newPosition.length - j - 1] = temp;
             }
         }
-        return  newPosition;
+        return newPosition;
     }
 
     public int[][] rotateRight(int[][] newPosition){
@@ -157,6 +149,12 @@ public class Tetromino extends Observable {
     }
 
     public int[][] getRepr() { return repr; }
+
+    public TileShape getShape() { return shape; }
+
+    public int getSquareSize() { return squareSize; }
+
+    public Rotation getRotation() { return rotation; }
 
     public int getX(){ return x; }
 

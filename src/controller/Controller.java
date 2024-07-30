@@ -47,17 +47,18 @@ public class Controller extends Observable implements Observer {
     public void handleMovement() {
 
         if(keyH.isDownPressed()){
-            tile.move(0, Game.GRAVITY *2);
+            tile.move(0, 1);
+            tile.move(0, 1);
         }
 
         if (keyH.isLeftPressed()) {
             if(!Game.tetrominoCollides(tile, tile.getX()-Game.HOR_VEL, tile.getY())){
-                tile.move(-Game.HOR_VEL, Game.GRAVITY);
+                tile.move(-1, 0);
             }
         }
         else if (keyH.isRightPressed()) {
             if(!Game.tetrominoCollides(tile, tile.getX()+Game.HOR_VEL, tile.getY())){
-                tile.move(+Game.HOR_VEL, Game.GRAVITY);
+                tile.move(+1, 0);
             }
         }
 

@@ -20,8 +20,8 @@ public class Game extends Observable implements Observer {
 
     private int rowsCleared;
 
-    public static final int HOR_VEL = 48;
-    public static final int GRAVITY = 48;
+    public static final int HOR_VEL = 38;
+    public static final int GRAVITY = 38;
 
     public Game() {
         this.state = GameEvent.INIT;
@@ -38,7 +38,7 @@ public class Game extends Observable implements Observer {
     }
 
     public void applyGravity(){
-        tile.move(0, GRAVITY);
+        tile.move(0, 1);
     }
 
     /**
@@ -54,9 +54,9 @@ public class Game extends Observable implements Observer {
         int tX = Math.max(x,0);
         int tY = Math.max(y, 0);
 
-        for(int i = tY; i < Tetromino.SQUARE_SIZE; i++ ){
-            for(int j = tX; j < Tetromino.SQUARE_SIZE; j++ ){
-                if(tetromino.getRepr()[i- tY][j-tX] != 0){
+        for(int i = tY; i < tetromino.getSquareSize(); i++ ){
+            for(int j = tX; j < tetromino.getSquareSize(); j++ ){
+                if(tetromino.getRepr()[i-tY][j-tX] != 0){
                     if(board[i][j]!=0) return true;
                 }
             }
@@ -71,7 +71,6 @@ public class Game extends Observable implements Observer {
             setChanged();
             notifyObservers(o);
         }
-
     }
 
     /**
@@ -81,8 +80,8 @@ public class Game extends Observable implements Observer {
         int tY = Math.max(tile.getY(), 0);
         int tX = Math.max(tile.getX(),0);
 
-        for(int i = tY; i < Tetromino.SQUARE_SIZE; i++ ){
-            for(int j = tX; j < Tetromino.SQUARE_SIZE; j++ ){
+        for(int i = tY; i < tile.getSquareSize(); i++ ){
+            for(int j = tX; j < tile.getSquareSize(); j++ ){
                 board[i][j] = tile.getRepr()[i-tY][j-tX];
             }
         }

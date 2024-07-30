@@ -20,7 +20,7 @@ public class Tetris {
         Controller controller = Controller.getInstance();
 
         // starting drop time
-        dropTime = 1;
+        dropTime = 1000000000;
 
         long timeStart = System.nanoTime();
 
@@ -37,6 +37,7 @@ public class Tetris {
                 controller.game.applyGravity();
                 timeStart = System.nanoTime();
             }
+
             timeAfter = System.nanoTime();
             timeDifference = timeAfter-timeBefore;
             nsSleep = NS_WAIT - timeDifference;
