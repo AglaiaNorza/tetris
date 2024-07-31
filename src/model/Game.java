@@ -1,5 +1,8 @@
 package model;
 
+import controller.Controller;
+
+import javax.crypto.spec.PSource;
 import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
@@ -26,7 +29,31 @@ public class Game extends Observable implements Observer {
     public Game() {
         this.state = GameEvent.INIT;
         this.score = 0;
-        board = new int[20][10];
+        //board = new int[22][10];
+        board = new int[][] {
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 0, 0, 0, 0, 4, 4, 0, 3, 3},
+                new int[]{0, 0, 0, 0, 0, 4, 4, 0, 3, 3},
+                new int[]{1, 0, 0, 5, 2, 2, 2, 2, 3, 3}};
+
         tile = new Tetromino();
         tile.addObserver(this);
     }
@@ -34,30 +61,31 @@ public class Game extends Observable implements Observer {
     public void startGame(){
         tile = new Tetromino();
         tile.addObserver(this);
-        preview = new Tetromino(200, 46);
+        preview = new Tetromino();
     }
 
     public void applyGravity(){
-        tile.move(0, 1);
+        System.out.println("gravity");
+        if(!Game.tetrominoCollides(tile, tile.getX(), tile.getY()+1)) tile.move(0, 1);
+        else updateBoard();
     }
 
     /**
      * Used to check whether a Tetromino collides with the rest of the board.
      * To collide, it just needs to hit one solid block.
      * @param tetromino the tile
-     * @param x the starting x coordinate of the area that needs to be checked
-     * @param y the starting y coordinate of the area that needs to be checked
+     * @param tX the starting x coordinate of the area that needs to be checked
+     * @param tY the starting y coordinate of the area that needs to be checked
      */
-    public static boolean tetrominoCollides(Tetromino tetromino, int x, int y){
+    public static boolean tetrominoCollides(Tetromino tetromino, int tX, int tY){
 
-        // avoid going out of bounds
-        int tX = Math.max(x,0);
-        int tY = Math.max(y, 0);
-
-        for(int i = tY; i < tetromino.getSquareSize(); i++ ){
-            for(int j = tX; j < tetromino.getSquareSize(); j++ ){
-                if(tetromino.getRepr()[i-tY][j-tX] != 0){
-                    if(board[i][j]!=0) return true;
+        for(int i = 0; i < tetromino.getSquareSize(); i++ ){
+            for(int j = 0; j < tetromino.getSquareSize(); j++ ){
+                if(tetromino.getRepr()[i][j] != 0){
+                    // trying to move out of bounds
+                    if(j+tX < 0 || j+tX > 9 || i+tY > 21) return true;
+                    // colliding
+                    if(board[i+tY][j+tX]!=0) return true;
                 }
             }
         }
@@ -66,10 +94,12 @@ public class Game extends Observable implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (o instanceof Tetromino) {
+        if(o instanceof  Tetromino) {
             if(Game.tetrominoCollides(tile, tile.getX(), tile.getY())) updateBoard();
-            setChanged();
-            notifyObservers(o);
+            else {
+                setChanged();
+                notifyObservers(arg);
+            }
         }
     }
 
@@ -77,14 +107,18 @@ public class Game extends Observable implements Observer {
      * Called when a Tetromino has landed. Adds the new Tetromino to the board.
      */
     public void updateBoard(){
-        int tY = Math.max(tile.getY(), 0);
-        int tX = Math.max(tile.getX(),0);
-
-        for(int i = tY; i < tile.getSquareSize(); i++ ){
-            for(int j = tX; j < tile.getSquareSize(); j++ ){
-                board[i][j] = tile.getRepr()[i-tY][j-tX];
+        for(int i = 0; i < tile.getSquareSize(); i++ ){
+            for(int j = 0; j < tile.getSquareSize(); j++ ){
+                if(tile.getRepr()[i][j] != 0){
+                    //System.out.println("changing tiles: " +(i+tile.getY()) + " "+(j+tile.getX()));
+                    board[i+tile.getY()][j+ tile.getX()] = tile.getRepr()[i][j];
+                }
             }
         }
+        tile = preview;
+        tile.addObserver(this);
+        applyGravity();
+        preview = new Tetromino();
         handleRows();
 
         if(!hasChanged()) {
@@ -97,14 +131,21 @@ public class Game extends Observable implements Observer {
      * Handles the completion of the rows
      */
     public void handleRows(){
+        boolean changed = false;
+
         for (int i= board.length-1; i>=0; i--){
             if (Arrays.stream(board[i]).noneMatch(num -> num == 0)){
-                Arrays.fill(board[i], 100); // marks them for deletion
+                System.out.println("change");
+                changed = true;
+                Arrays.fill(board[i], 5); // marks them for deletion
                 addClearedRow();
             }
         }
-        setChanged();
-        notifyObservers(GameEvent.ROW_COMPLETED);
+
+        if(changed){
+            setChanged();
+            notifyObservers(GameEvent.ROW_COMPLETED);
+        }
     }
 
     public void addClearedRow() {
@@ -120,4 +161,6 @@ public class Game extends Observable implements Observer {
     public int getLevel() { return level; }
 
     public Tetromino getTile() { return tile; }
+
+    public int[][] getBoard() { return board; }
 }

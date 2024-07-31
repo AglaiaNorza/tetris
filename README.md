@@ -4,7 +4,6 @@
 
 - entire view basically (panels)
 - game events (pause!!)
-- pretty sure collision check doesn't work
 - stop tetrominoes
 - new tetromino handling
 - score
@@ -12,3 +11,4 @@
 
 #### less important:
 - themes
+- (ideally try doing the position preview thingy but mmmmm)

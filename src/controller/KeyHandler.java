@@ -31,20 +31,44 @@ public class KeyHandler implements KeyListener {
      */
     @Override
     public void keyPressed(KeyEvent e) {
+        boolean moved = false;
 
         switch (e.getKeyCode()){
-            case KeyEvent.VK_UP -> upPressed = true;
+            case KeyEvent.VK_UP -> {
+                upPressed = true;
+                Controller.getInstance().handleMovement();
+                moved = true;
+                upReleased = false;
+            }
+
             case KeyEvent.VK_LEFT -> leftPressed = true;
             case KeyEvent.VK_RIGHT -> rightPressed = true;
             case KeyEvent.VK_DOWN -> downPressed = true;
-            case KeyEvent.VK_X -> xPressed = true;
-            case KeyEvent.VK_Z -> zPressed = true;
-            case KeyEvent.VK_SPACE -> spacePressed = true;
-            case KeyEvent.VK_CONTROL -> controlPressed = true;
-        }
-        Controller.getInstance().handleMovement();
 
-        upReleased = xReleased = controlReleased = zReleased = false;
+            case KeyEvent.VK_X -> {
+                xPressed = true;
+                Controller.getInstance().handleMovement();
+                moved = true;
+                xReleased = false;
+            }
+
+            case KeyEvent.VK_Z -> {
+                zPressed = true;
+                Controller.getInstance().handleMovement();
+                moved = true;
+                zReleased = false;
+            }
+
+            case KeyEvent.VK_SPACE -> spacePressed = true;
+
+            case KeyEvent.VK_CONTROL -> {
+                controlPressed = true;
+                Controller.getInstance().handleMovement();
+                moved = true;
+                controlReleased = false;
+            }
+        }
+        if(!moved) Controller.getInstance().handleMovement();
     }
 
     /**

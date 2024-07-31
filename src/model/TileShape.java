@@ -31,4 +31,54 @@ public enum TileShape {
         };
     }
 
+    public int[][] generateRepr(){
+        return switch (this){
+            case O -> new int[][]{
+                    {0,0,0,0},
+                    {0,color,color,0},
+                    {0,color,color,0},
+                    {0,0,0,0}
+            };
+            case I -> new int[][]{
+                    {0,0,0,0},
+                    {color,color,color,color},
+                    {0,0,0,0},
+                    {0,0,0,0}
+            };
+            case S -> new int[][]{
+                    {0,color,color},
+                    {color,color,0},
+                    {0,0,0,}
+            };
+            case Z -> new int[][]{
+                    {color,color,0,0},
+                    {0,color,color},
+                    {0,0,0}
+            };
+            case L -> new int[][]{
+                    {0,0,color},
+                    {color,color,color},
+                    {0,0,0}
+            };
+            case J -> new int[][]{
+                    {color,0,0},
+                    {color,color,color},
+                    {0,0,0,0}
+            };
+
+            case T -> new int[][]{
+                    {0,color,0},
+                    {color,color, color},
+                    {0,0,0}
+            };
+        };
+    }
+
+    public int generateSpawnX(){
+        return switch (this){
+            case I, O -> Math.random()<0.5 ? 3 : 4;
+            default -> Math.random()<0.5 ? 1 : 2;
+        };
+    }
+
 }

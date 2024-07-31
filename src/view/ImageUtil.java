@@ -38,6 +38,14 @@ public class ImageUtil {
                 ));
     }
 
+    public static HashMap<Integer, BufferedImage> getTileMap() {
+        HashMap<Integer, BufferedImage> tileMap = new HashMap<>();
+        for(int i = 1; i<8; i++){
+            tileMap.put(i, getImage("../resources/blocks/classic/"+ i +".png"));
+        }
+        return tileMap;
+    }
+
     /**
      * Given a relative path to an image it returns the BufferedImage of it
      * @param path the path to an image

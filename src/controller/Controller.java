@@ -45,21 +45,23 @@ public class Controller extends Observable implements Observer {
     }
 
     public void handleMovement() {
+        System.out.println("checking");
+        System.out.println("upPressed: " + keyH.isUpPressed() + " upR: " + keyH.isUpReleased());
 
-        if(keyH.isDownPressed()){
-            tile.move(0, 1);
-            tile.move(0, 1);
+        if(keyH.isDownPressed()) {
+            if (!Game.tetrominoCollides(tile, tile.getX(), tile.getY() + 2)) {
+                tile.move(0, 1);
+                tile.move(0, 1);
+            }
         }
 
         if (keyH.isLeftPressed()) {
-            if(!Game.tetrominoCollides(tile, tile.getX()-Game.HOR_VEL, tile.getY())){
+            if(!Game.tetrominoCollides(tile, tile.getX()-1, tile.getY()))
                 tile.move(-1, 0);
-            }
         }
         else if (keyH.isRightPressed()) {
-            if(!Game.tetrominoCollides(tile, tile.getX()+Game.HOR_VEL, tile.getY())){
-                tile.move(+1, 0);
-            }
+            if(!Game.tetrominoCollides(tile, tile.getX()+1, tile.getY()))
+                    tile.move(1, 0);
         }
 
         else if((keyH.isUpPressed() && keyH.isUpReleased()) || (keyH.isXPressed() && keyH.isXReleased())){
@@ -80,17 +82,34 @@ public class Controller extends Observable implements Observer {
     //called when the game does stuff (ex end of game)
     @Override
     public void update(Observable o, Object arg) {
-        if (o instanceof Game){
-            if(arg == Game.GameEvent.LEVEL_UP){
-                Tetris.setDropTime(Math.pow((0.8-((game.getLevel()-1)*0.007)),(game.getLevel()-1)));
+        switch (arg){
+
+            case Tetromino tetromino -> {
+                System.out.println("received move by "+ tetromino.getShape());
+                this.tile = tetromino;
                 setChanged();
-                notifyObservers(Game.GameEvent.LEVEL_UP);
+                notifyObservers(tetromino);
             }
-            else if(arg instanceof Tetromino){
-                this.tile = (Tetromino)arg;
-                setChanged();
-                notifyObservers(arg);
+
+            case Game.GameEvent event -> {
+                switch (event){
+                    case LEVEL_UP -> {
+                        Tetris.setDropTime(Math.pow((0.8-((game.getLevel()-1)*0.007)),(game.getLevel()-1)));
+                        setChanged();
+                        notifyObservers(event);
+                    }
+
+                    case ROW_COMPLETED, BOARD_CHANGE -> {
+                        setTetromino(game.getTile());
+                        setChanged();
+                        notifyObservers(event);
+                    }
+                }
+
             }
+
+            default -> {}
+
         }
     }
 

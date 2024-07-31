@@ -15,8 +15,7 @@ public class Tetris {
         long timeDifference;
         long nsSleep;
 
-        TetrisFrame frame = TetrisFrame.getInstance();
-
+        TetrisFrame.getInstance();
         Controller controller = Controller.getInstance();
 
         // starting drop time

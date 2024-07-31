@@ -27,7 +27,7 @@ public class TetrisFrame extends JFrame implements Observer {
     private MenuPanel menuPanel;
 
     private TetrisFrame(){
-        setSize(new Dimension(Tetromino.TILE_SIZE*10, Tetromino.TILE_SIZE*20));
+        setSize(new Dimension(Tetromino.TILE_SIZE*10, Tetromino.TILE_SIZE*20+19));
         panelShower = new JPanel();
         panelSelection = new CardLayout();
         panelShower.setLayout(panelSelection);
@@ -54,12 +54,13 @@ public class TetrisFrame extends JFrame implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
+        System.out.println("arg is" + arg.getClass());
         switch (arg) {
             // at game start
             case Game newGame -> {
                 game = newGame;
 
-                gamePanel = new GamePanel(game.getTile());
+                gamePanel = new GamePanel(game.getTile(), game.getBoard());
 
                 panelShower.add(gamePanel, Screen.GAME.name());
                 panelSelection.show(panelShower, Screen.GAME.name());
@@ -67,10 +68,9 @@ public class TetrisFrame extends JFrame implements Observer {
 
             case Game.GameEvent event -> {
 
+                System.out.println("here");
+
                 switch (event){
-                    case ROW_COMPLETED -> {
-                        //clearRow();
-                    }
 
                     case END -> {
                         switchScreen(Screen.END);
@@ -80,7 +80,9 @@ public class TetrisFrame extends JFrame implements Observer {
 
                     }
 
-                    case BOARD_CHANGE -> {
+                    case BOARD_CHANGE, ROW_COMPLETED -> {
+                        gamePanel.setBoard(game.getBoard());
+                        gamePanel.setTile(game.getTile());
                         gamePanel.repaint();
                     }
                 }
@@ -88,7 +90,7 @@ public class TetrisFrame extends JFrame implements Observer {
             }
 
             case Tetromino tile -> {
-                gamePanel.setTile((Tetromino) arg);
+                gamePanel.setTile((Tetromino)arg);
                 gamePanel.repaint();
             }
 

@@ -12,36 +12,27 @@ public class Tetromino extends Observable {
     private final TileShape shape;
     private int squareSize;
     private Rotation rotation;
-    private int color;
     public static final int TILE_SIZE = 38;
     private int[][] repr;
     private int x,y;
 
-    // todo
-    //   Tetromino start locations
-    //    The I and O spawn in the middle columns
-    //    The rest spawn in the left-middle columns
-    //    Spawn above playfield, row 21 for I, and 21/22 for all other tetriminoes.
-
     public Tetromino() {
         this.shape = TileShape.getRandomShape();
         squareSize = shape.getSquareSize();
-        this.color = (int)(Math.random() * 6);
         this.rotation = Rotation.STANDARD;
-        y = -3;
-        x = (int) (Math.random()*(7+3)-3);//random spawn x
-        repr = generateRepr();
+        y = 0;
+        x = shape.generateSpawnX();
+        repr = shape.generateRepr();
     }
 
     public Tetromino(int x, int y){
         this.shape = TileShape.getRandomShape();
-        this.color = (int)(Math.random()*6);
         this.x = x;
         this.y = y;
-        repr = generateRepr();
+        repr = shape.generateRepr();
     }
 
-    public Tetromino(int[][] repr, int x, int y, TileShape shape){
+    public Tetromino(int[][] repr, int x, int y, TileShape shape, Rotation rotation){
         this.repr = repr;
         this.shape = shape;
         this.x = x;
@@ -49,54 +40,11 @@ public class Tetromino extends Observable {
     }
 
     public void move(int velX, int velY){
-        System.out.println("moving"+velX);
         y+=velY;
         x+=velX;
+        System.out.println("moving");
         setChanged();
         notifyObservers(this);
-    }
-
-    public int[][] generateRepr(){
-        return switch (shape){
-            case O -> new int[][]{
-                    {0,0,0,0},
-                    {0,color,color,0},
-                    {0,color,color,0},
-                    {0,0,0,0}
-            };
-            case I -> new int[][]{
-                    {0,0,0,0},
-                    {color,color,color,color},
-                    {0,0,0,0},
-                    {0,0,0,0}
-            };
-            case S -> new int[][]{
-                    {0,color,color},
-                    {color,color,0},
-                    {0,0,0,}
-            };
-            case Z -> new int[][]{
-                    {color,color,0,0},
-                    {0,color,color},
-                    {0,0,0}
-            };
-            case L -> new int[][]{
-                    {0,0,color},
-                    {color,color,color},
-                    {0,0,0}
-            };
-            case J -> new int[][]{
-                    {color,0,0},
-                    {color,color,color},
-                    {0,0,0,0}
-            };
-
-            case T -> new int[][]{
-                    {0,color,0},
-                    {color,color, color},
-                    {0,0,0}
-            };
-        };
     }
 
     public boolean tryRotating(Direction dir) {
@@ -114,18 +62,18 @@ public class Tetromino extends Observable {
 
         newPosition = dir==Direction.LEFT ? rotateLeft(newPosition) : rotateRight(newPosition);
 
-        if(!Game.tetrominoCollides(new Tetromino(newPosition, x, y, shape), x, y)){
+        if(!Game.tetrominoCollides(new Tetromino(newPosition, x, y, shape, rotation), x, y)){
             repr = newPosition;
             rotation = rotation.getNext(dir);
             setChanged();
-            notifyObservers();
+            notifyObservers(this);
             return true;
         }
 
         return false;
     }
 
-    public int[][] rotateLeft(int[][] newPosition){
+    public int[][] rotateRight(int[][] newPosition){
 
         for (int i = 0; i < newPosition.length; i++) {
             for (int j = 0; j < newPosition.length / 2; j++) {
@@ -137,7 +85,7 @@ public class Tetromino extends Observable {
         return newPosition;
     }
 
-    public int[][] rotateRight(int[][] newPosition){
+    public int[][] rotateLeft(int[][] newPosition){
         for (int i = 0; i < newPosition.length; i++) {
             for (int j = 0; j < newPosition.length / 2; j++) {
                 int temp = newPosition[j][i];
