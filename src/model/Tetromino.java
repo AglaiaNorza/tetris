@@ -17,7 +17,8 @@ public class Tetromino extends Observable {
     private int x,y;
 
     public Tetromino() {
-        this.shape = TileShape.getRandomShape();
+        //shape = TileShape.getRandomShape();
+        shape = TileShape.O;
         squareSize = shape.getSquareSize();
         this.rotation = Rotation.STANDARD;
         y = 0;

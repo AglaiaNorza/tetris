@@ -6,6 +6,7 @@ import model.TileShape;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
@@ -44,6 +45,14 @@ public class ImageUtil {
             tileMap.put(i, getImage("../resources/blocks/classic/"+ i +".png"));
         }
         return tileMap;
+    }
+
+    public static ArrayList<BufferedImage> getAnimationArray() {
+        ArrayList<BufferedImage> animationArray = new ArrayList<>();
+        for(int i = 1; i<16; i++){
+            animationArray.add(getImage("../resources/animation/"+ i +".png"));
+        }
+        return animationArray;
     }
 
     /**

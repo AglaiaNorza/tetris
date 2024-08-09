@@ -6,12 +6,19 @@ import model.TileShape;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Optional;
 
 public class GamePanel extends JPanel {
     private Tetromino tile;
     private int[][] board;
+
+    private AnimationPanel animationPanel;
 
     private HashMap<TileShape, HashMap<Rotation, BufferedImage>> tetrominoMap;
     private HashMap<Integer, BufferedImage> boardMap;
@@ -26,6 +33,8 @@ public class GamePanel extends JPanel {
         tetrominoMap = ImageUtil.getTetrominoMap();
         this.board = board;
         boardMap = ImageUtil.getTileMap();
+        animationPanel = new AnimationPanel();
+        add(animationPanel);
     }
 
     @Override
@@ -45,7 +54,7 @@ public class GamePanel extends JPanel {
     }
 
     public void paintTile(Graphics g){
-        Image img = tetrominoMap.get(tile.getShape()).get(tile.getRotation()).getScaledInstance(38*tile.getSquareSize(),38*tile.getSquareSize(), Image.SCALE_SMOOTH);
+        BufferedImage img = tetrominoMap.get(tile.getShape()).get(tile.getRotation());
         g.drawImage(img, tile.getX()*38, tile.getY()*38 + boardShift, null);
     }
 
@@ -56,4 +65,53 @@ public class GamePanel extends JPanel {
     public void setBoard(int[][] board) {
         this.board = board;
     }
+
+    public AnimationPanel getAnimationPanel() { return animationPanel; }
+
+    public class AnimationPanel extends JPanel {
+        private Timer animationTimer;
+        private BufferedImage curFrame;
+        private Optional<ArrayList<Integer>> rows = Optional.empty();
+        Iterator<BufferedImage> animation = ImageUtil.getAnimationArray().iterator();
+
+        public AnimationPanel() {
+            setPreferredSize(new Dimension(Tetromino.TILE_SIZE * 10, Tetromino.TILE_SIZE * 20));
+            setOpaque(false);
+
+            animationTimer = new Timer(24, _ -> {
+                curFrame = animation.next();
+                repaint();
+                if(!animation.hasNext()){
+                    //resetting the animation
+                    animation = ImageUtil.getAnimationArray().iterator();
+                    setVisible(false);
+                    animationTimer.stop();
+                }
+            });
+        }
+
+        public void rowCleared(ArrayList<Integer> r) {
+            rows = Optional.of(r);
+            setVisible(true);
+            animationTimer.start();
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            System.out.println("repainting");
+
+            if(rows.isPresent()){
+                ArrayList<Integer> r = rows.get();
+                for(int i = 0; i < r.size(); i++){
+                    int j = r.getFirst() - i;
+                    g.drawImage(curFrame, 0, (j - 2) * Tetromino.TILE_SIZE, null);
+                }
+            }
+
+        }
+    }
+
 }
+
+

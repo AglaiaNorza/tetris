@@ -1,8 +1,6 @@
 package model;
 
-import controller.Controller;
-
-import javax.crypto.spec.PSource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
@@ -22,9 +20,7 @@ public class Game extends Observable implements Observer {
     private int level;
 
     private int rowsCleared;
-
-    public static final int HOR_VEL = 38;
-    public static final int GRAVITY = 38;
+    private ArrayList<Integer> completed;
 
     public Game() {
         this.state = GameEvent.INIT;
@@ -50,12 +46,13 @@ public class Game extends Observable implements Observer {
                 new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                new int[]{0, 0, 0, 0, 0, 4, 4, 0, 3, 3},
-                new int[]{0, 0, 0, 0, 0, 4, 4, 0, 3, 3},
-                new int[]{1, 0, 0, 5, 2, 2, 2, 2, 3, 3}};
+                new int[]{1, 1, 1, 0, 0, 4, 4, 1, 3, 3},
+                new int[]{2, 2, 1, 0, 0, 4, 4, 2, 3, 3},
+                new int[]{1, 2, 0, 5, 2, 2, 2, 2, 3, 3}};
 
         tile = new Tetromino();
         tile.addObserver(this);
+        completed = new ArrayList<>();
     }
 
     public void startGame(){
@@ -65,9 +62,8 @@ public class Game extends Observable implements Observer {
     }
 
     public void applyGravity(){
-        System.out.println("gravity");
         if(!Game.tetrominoCollides(tile, tile.getX(), tile.getY()+1)) tile.move(0, 1);
-        else updateBoard();
+        if(Game.tetrominoCollides(tile, tile.getX(), tile.getY()+1)) updateBoard();
     }
 
     /**
@@ -115,6 +111,7 @@ public class Game extends Observable implements Observer {
                 }
             }
         }
+
         tile = preview;
         tile.addObserver(this);
         applyGravity();
@@ -132,14 +129,13 @@ public class Game extends Observable implements Observer {
      */
     public void handleRows(){
         boolean changed = false;
-
-        for (int i= board.length-1; i>=0; i--){
+        int i = board.length-1;
+        while (i>=0){
             if (Arrays.stream(board[i]).noneMatch(num -> num == 0)){
-                System.out.println("change");
                 changed = true;
-                Arrays.fill(board[i], 5); // marks them for deletion
-                addClearedRow();
-            }
+                clearRows(i);
+                addClearedRow(i);
+            } else i-=1;
         }
 
         if(changed){
@@ -148,7 +144,14 @@ public class Game extends Observable implements Observer {
         }
     }
 
-    public void addClearedRow() {
+    public void clearRows(int rowIn) {
+        for(int i = rowIn; i > 0; i--) {
+            board[i] = board[i-1];
+        }
+    }
+
+    public void addClearedRow(int r) {
+        completed.add(r);
         rowsCleared++;
         if(rowsCleared==10){
             level++;
@@ -156,6 +159,15 @@ public class Game extends Observable implements Observer {
             notifyObservers(GameEvent.LEVEL_UP);
             rowsCleared = 0;
         }
+    }
+
+    public ArrayList<Integer> getCompleted() {
+        ArrayList<Integer> done = (ArrayList<Integer>) completed.clone();
+        completed = new ArrayList<>();
+        for (int i = 0; i < done.size(); i++) {
+            System.out.println(done.get(i));
+        }
+        return done;
     }
 
     public int getLevel() { return level; }

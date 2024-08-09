@@ -80,7 +80,19 @@ public class TetrisFrame extends JFrame implements Observer {
 
                     }
 
-                    case BOARD_CHANGE, ROW_COMPLETED -> {
+                    case BOARD_CHANGE -> {
+                        gamePanel.setBoard(game.getBoard());
+                        gamePanel.setTile(game.getTile());
+                        gamePanel.repaint();
+                    }
+
+                    case ROW_COMPLETED -> {
+                        gamePanel.getAnimationPanel().rowCleared(game.getCompleted());
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
                         gamePanel.setBoard(game.getBoard());
                         gamePanel.setTile(game.getTile());
                         gamePanel.repaint();

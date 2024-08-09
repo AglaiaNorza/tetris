@@ -45,14 +45,11 @@ public class Controller extends Observable implements Observer {
     }
 
     public void handleMovement() {
-        System.out.println("checking");
-        System.out.println("upPressed: " + keyH.isUpPressed() + " upR: " + keyH.isUpReleased());
 
         if(keyH.isDownPressed()) {
-            if (!Game.tetrominoCollides(tile, tile.getX(), tile.getY() + 2)) {
-                tile.move(0, 1);
-                tile.move(0, 1);
-            }
+            //move twice as fast
+            game.applyGravity();
+            game.applyGravity();
         }
 
         if (keyH.isLeftPressed()) {
