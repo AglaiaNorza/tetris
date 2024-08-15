@@ -1,5 +1,6 @@
 package model;
 
+import java.util.Arrays;
 import java.util.Observable;
 
 @SuppressWarnings("deprecation")
@@ -17,8 +18,7 @@ public class Tetromino extends Observable {
     private int x,y;
 
     public Tetromino() {
-        //shape = TileShape.getRandomShape();
-        shape = TileShape.O;
+        shape = TileShape.getRandomShape();
         squareSize = shape.getSquareSize();
         this.rotation = Rotation.STANDARD;
         y = 0;
@@ -26,16 +26,11 @@ public class Tetromino extends Observable {
         repr = shape.generateRepr();
     }
 
-    public Tetromino(int x, int y){
-        this.shape = TileShape.getRandomShape();
-        this.x = x;
-        this.y = y;
-        repr = shape.generateRepr();
-    }
-
     public Tetromino(int[][] repr, int x, int y, TileShape shape, Rotation rotation){
         this.repr = repr;
         this.shape = shape;
+        this.rotation = rotation;
+        this.squareSize = shape.getSquareSize();
         this.x = x;
         this.y = y;
     }
@@ -43,14 +38,30 @@ public class Tetromino extends Observable {
     public void move(int velX, int velY){
         y+=velY;
         x+=velX;
-        System.out.println("moving");
         setChanged();
         notifyObservers(this);
     }
 
+    /**
+     * Calculates the lowest row the tile can drop to before colliding.
+     * Used for the "hard drop" and the "ghost" preview.
+     * @return the lowest row the tile can drop to.
+     */
+    public int getDropPoint(){
+        int holdRow = y;
+
+        while (!Game.tetrominoCollides(this, x, holdRow)) {
+            holdRow++;
+        }
+
+        return holdRow-1;
+    }
+
     public boolean tryRotating(Direction dir) {
 
-        int[][] newPosition = repr.clone();
+        int[][] newPosition = Arrays.stream(repr)
+                .map(int[]::clone)
+                .toArray(int[][]::new);
 
         // transpose
         for (int i = 0; i < newPosition.length; i++) {
@@ -61,7 +72,7 @@ public class Tetromino extends Observable {
             }
         }
 
-        newPosition = dir==Direction.LEFT ? rotateLeft(newPosition) : rotateRight(newPosition);
+        newPosition = dir == Direction.LEFT ? rotateLeft(newPosition) : rotateRight(newPosition);
 
         if(!Game.tetrominoCollides(new Tetromino(newPosition, x, y, shape, rotation), x, y)){
             repr = newPosition;
@@ -95,6 +106,12 @@ public class Tetromino extends Observable {
             }
         }
         return newPosition;
+    }
+
+    public void hardDrop() {
+        y = getDropPoint();
+        setChanged();
+        notifyObservers(Game.GameEvent.BOARD_CHANGE);
     }
 
     public int[][] getRepr() { return repr; }

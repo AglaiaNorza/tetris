@@ -1,6 +1,5 @@
 package controller;
 
-import model.Game;
 import view.TetrisFrame;
 
 public class Tetris {
@@ -8,6 +7,7 @@ public class Tetris {
     public static long NS_WAIT = 1000000000/60;
     private static double dropTime;
     private static boolean playing;
+    private static boolean paused;
 
     public static void main(String[] args) {
         long timeBefore;
@@ -29,7 +29,14 @@ public class Tetris {
             }catch(InterruptedException e){e.printStackTrace();}
         }
 
-        while (playing){
+        while(playing) {
+
+            while(paused) {
+                try{
+                    Thread.sleep(1);
+                } catch(InterruptedException e) { e.printStackTrace(); }
+            }
+
             timeBefore = System.nanoTime();
 
             if (System.nanoTime() - timeStart >= dropTime){
@@ -50,5 +57,7 @@ public class Tetris {
     public static void setDropTime(double newTime) { dropTime = newTime; }
 
     public static void setPlaying(boolean p) { playing = p; }
+
+    public static void setPaused(boolean p) { paused = p; }
 
 }

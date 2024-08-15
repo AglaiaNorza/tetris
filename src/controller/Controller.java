@@ -19,16 +19,16 @@ public class Controller extends Observable implements Observer {
 
     private Tetromino tile;
 
-    private Controller(){
+    private Controller() {
         keyH = new KeyHandler();
     }
 
-    public static Controller getInstance(){
+    public static Controller getInstance() {
         if(instance==null) instance = new Controller();
         return instance;
     }
 
-    public void startGame(){
+    public void startGame() {
         game = new Game();
         game.addObserver(this);
         setChanged();
@@ -38,40 +38,30 @@ public class Controller extends Observable implements Observer {
         TetrisFrame.getInstance().addKeyListener(keyH);
     }
 
-    public void pauseGame(){
-    }
-
-    public void endGame(){
+    public void endGame() {
     }
 
     public void handleMovement() {
 
-        if(keyH.isDownPressed()) {
+        if(keyH.isDownPressed() && keyH.isDownReleased()) {
             //move twice as fast
             game.applyGravity();
             game.applyGravity();
         }
-
-        if (keyH.isLeftPressed()) {
-            if(!Game.tetrominoCollides(tile, tile.getX()-1, tile.getY()))
-                tile.move(-1, 0);
+        if (keyH.isLeftPressed() && keyH.isLeftReleased()) {
+            if(!Game.tetrominoCollides(tile, tile.getX()-1, tile.getY())) tile.move(-1, 0);
         }
-        else if (keyH.isRightPressed()) {
-            if(!Game.tetrominoCollides(tile, tile.getX()+1, tile.getY()))
-                    tile.move(1, 0);
+        else if (keyH.isRightPressed() && keyH.isRightReleased()) {
+            if(!Game.tetrominoCollides(tile, tile.getX()+1, tile.getY())) tile.move(1, 0);
         }
-
         else if((keyH.isUpPressed() && keyH.isUpReleased()) || (keyH.isXPressed() && keyH.isXReleased())){
             tile.tryRotating(Tetromino.Direction.RIGHT);
         }
-
         else if((keyH.isControlPressed() && keyH.isControlReleased()) || (keyH.isZPressed() && keyH.isZReleased())){
             tile.tryRotating(Tetromino.Direction.LEFT);
         }
+        else if(keyH.isSpacePressed() && keyH.isSpaceReleased()) tile.hardDrop();
 
-        else if(keyH.isSpacePressed() && keyH.isSpaceReleased()){
-            //hard drop
-        }
         setChanged();
         notifyObservers(tile);
     }
@@ -82,7 +72,6 @@ public class Controller extends Observable implements Observer {
         switch (arg){
 
             case Tetromino tetromino -> {
-                System.out.println("received move by "+ tetromino.getShape());
                 this.tile = tetromino;
                 setChanged();
                 notifyObservers(tetromino);
@@ -97,6 +86,7 @@ public class Controller extends Observable implements Observer {
                     }
 
                     case ROW_COMPLETED, BOARD_CHANGE -> {
+                        keyH.onLand();
                         setTetromino(game.getTile());
                         setChanged();
                         notifyObservers(event);

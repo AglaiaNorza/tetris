@@ -11,11 +11,11 @@ public class KeyHandler implements KeyListener {
     private boolean upPressed, leftPressed, rightPressed, downPressed;
     private boolean xPressed, zPressed, spacePressed, controlPressed;
 
-    private boolean upReleased;
+    private boolean upReleased, downReleased, leftReleased, rightReleased;
     private boolean xReleased, zReleased, spaceReleased, controlReleased;
 
     public KeyHandler(){
-        upReleased = xReleased = zReleased = spaceReleased = true;
+        upReleased = xReleased = zReleased = spaceReleased = downReleased = true;
     }
 
     /**
@@ -42,7 +42,9 @@ public class KeyHandler implements KeyListener {
             }
 
             case KeyEvent.VK_LEFT -> leftPressed = true;
+
             case KeyEvent.VK_RIGHT -> rightPressed = true;
+
             case KeyEvent.VK_DOWN -> downPressed = true;
 
             case KeyEvent.VK_X -> {
@@ -85,13 +87,19 @@ public class KeyHandler implements KeyListener {
             }
             case KeyEvent.VK_LEFT -> {
                 leftPressed = false;
+                leftReleased = true;
             }
+
             case KeyEvent.VK_RIGHT -> {
                 rightPressed = false;
+                rightReleased = true;
             }
+
             case KeyEvent.VK_DOWN -> {
                 downPressed = false;
+                downReleased = true;
             }
+
             case KeyEvent.VK_X -> {
                 xPressed = false;
                 xReleased = true;
@@ -110,6 +118,12 @@ public class KeyHandler implements KeyListener {
             }
         };
         Controller.getInstance().handleMovement();
+    }
+
+    public void onLand(){
+        if(downPressed) downReleased = false;
+        if(rightPressed) rightReleased = false;
+        if(leftPressed) leftReleased = false;
     }
 
     /**
@@ -175,5 +189,20 @@ public class KeyHandler implements KeyListener {
      * @return whether the ctrl key is released
      */
     public boolean isControlReleased() { return controlReleased; }
+
+    /**
+     * @return whether the down arrow key is released
+     */
+    public boolean isDownReleased() { return downReleased; }
+
+    /**
+     * @return whether the down arrow key is released
+     */
+    public boolean isLeftReleased() { return leftReleased; }
+
+    /**
+     * @return whether the down arrow key is released
+     */
+    public boolean isRightReleased() { return rightReleased; }
 
 }

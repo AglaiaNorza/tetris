@@ -77,27 +77,36 @@ public class Game extends Observable implements Observer {
 
         for(int i = 0; i < tetromino.getSquareSize(); i++ ){
             for(int j = 0; j < tetromino.getSquareSize(); j++ ){
+                System.out.println("in the loop");
                 if(tetromino.getRepr()[i][j] != 0){
+                    System.out.println("checking coords, x: " + (j+tX) + " y: " + (i+tY));
                     // trying to move out of bounds
-                    if(j+tX < 0 || j+tX > 9 || i+tY > 21) return true;
+                    if(j+tX < 0 || j+tX > 9 || i+tY > 21) {
+                        return true;
+                    }
+
                     // colliding
                     if(board[i+tY][j+tX]!=0) return true;
                 }
             }
         }
+        System.out.println("returning no collision");
         return false;
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        if(o instanceof  Tetromino) {
-            if(Game.tetrominoCollides(tile, tile.getX(), tile.getY())) updateBoard();
+        if(o instanceof Tetromino) {
+            System.out.println("calling from game update");
+            if(arg == GameEvent.BOARD_CHANGE) updateBoard();
+            else if(Game.tetrominoCollides(tile, tile.getX(), tile.getY())) updateBoard();
             else {
                 setChanged();
-                notifyObservers(arg);
+                notifyObservers(o);
             }
         }
     }
+
 
     /**
      * Called when a Tetromino has landed. Adds the new Tetromino to the board.
@@ -106,7 +115,6 @@ public class Game extends Observable implements Observer {
         for(int i = 0; i < tile.getSquareSize(); i++ ){
             for(int j = 0; j < tile.getSquareSize(); j++ ){
                 if(tile.getRepr()[i][j] != 0){
-                    //System.out.println("changing tiles: " +(i+tile.getY()) + " "+(j+tile.getX()));
                     board[i+tile.getY()][j+ tile.getX()] = tile.getRepr()[i][j];
                 }
             }
@@ -116,6 +124,8 @@ public class Game extends Observable implements Observer {
         tile.addObserver(this);
         applyGravity();
         preview = new Tetromino();
+        setChanged();
+        notifyObservers(GameEvent.BOARD_CHANGE);
         handleRows();
 
         if(!hasChanged()) {
@@ -164,9 +174,6 @@ public class Game extends Observable implements Observer {
     public ArrayList<Integer> getCompleted() {
         ArrayList<Integer> done = (ArrayList<Integer>) completed.clone();
         completed = new ArrayList<>();
-        for (int i = 0; i < done.size(); i++) {
-            System.out.println(done.get(i));
-        }
         return done;
     }
 

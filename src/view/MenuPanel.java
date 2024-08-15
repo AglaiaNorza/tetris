@@ -4,9 +4,8 @@ import model.Tetromino;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+// TODO
 public class MenuPanel extends JPanel {
 
     MenuPanel() {
@@ -14,7 +13,7 @@ public class MenuPanel extends JPanel {
         setBackground(Color.RED);
         add(new JButton(){
             {
-                addActionListener(e -> TetrisFrame.getInstance().gameStartClicked());
+                addActionListener( _ -> TetrisFrame.getInstance().gameStartClicked() );
             }
         });
     }
