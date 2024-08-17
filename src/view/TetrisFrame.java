@@ -15,10 +15,10 @@ import java.util.Observer;
 public class TetrisFrame extends JFrame implements Observer {
 
     public enum Screen {
-        MENU, GAME, PAUSE, HELP, SETTINGS, END;
+        MENU, GAME, PAUSE, RULES, THEMES, LEADERBOARD, END;
     }
 
-    public static final Dimension FRAME_SIZE = new Dimension(Tetromino.TILE_SIZE*10, Tetromino.TILE_SIZE*20+19);
+    public static final Dimension FRAME_SIZE = new Dimension(1140, 760);
 
     private static TetrisFrame instance;
     protected JPanel panelShower;
@@ -26,15 +26,20 @@ public class TetrisFrame extends JFrame implements Observer {
 
     private Game game;
 
+    private BoardPanel boardPanel;
     private GamePanel gamePanel;
     private MenuPanel menuPanel;
     private PausePanel pausePanel;
+    private RulesPanel rulesPanel;
+    private LeaderboardPanel leaderboardPanel;
+    private ThemePanel themePanel;
 
     private TetrisFrame(){
         setSize(FRAME_SIZE);
         panelShower = new JPanel();
         panelSelection = new CardLayout();
         panelShower.setLayout(panelSelection);
+        panelShower.setSize(FRAME_SIZE);
 
         Controller.getInstance().addObserver(this);
 
@@ -45,7 +50,17 @@ public class TetrisFrame extends JFrame implements Observer {
         pausePanel = new PausePanel();
         panelShower.add(pausePanel, Screen.PAUSE.name());
 
+        rulesPanel = new RulesPanel();
+        panelShower.add(rulesPanel, Screen.RULES.name());
+
+        leaderboardPanel = new LeaderboardPanel();
+        panelShower.add(leaderboardPanel, Screen.LEADERBOARD.name());
+
+        themePanel = new ThemePanel();
+        panelShower.add(themePanel, Screen.THEMES.name());
+
         add(panelShower);
+        setResizable(false);
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
@@ -55,9 +70,7 @@ public class TetrisFrame extends JFrame implements Observer {
         return instance;
     }
 
-    public void switchScreen(Screen screen) {
-        panelSelection.show(panelShower, screen.name());
-    }
+    public void switchScreen(Screen screen) { panelSelection.show(panelShower, screen.name()); }
 
     @Override
     public void update(Observable o, Object arg) {
@@ -66,7 +79,8 @@ public class TetrisFrame extends JFrame implements Observer {
             case Game newGame -> {
                 game = newGame;
 
-                gamePanel = new GamePanel(game.getTile(), game.getBoard());
+                boardPanel = new BoardPanel(game.getTile(), game.getBoard());
+                gamePanel = new GamePanel(boardPanel);
 
                 panelShower.add(gamePanel, Screen.GAME.name());
                 panelSelection.show(panelShower, Screen.GAME.name());
@@ -85,26 +99,26 @@ public class TetrisFrame extends JFrame implements Observer {
                     }
 
                     case BOARD_CHANGE -> {
-                        gamePanel.setBoard(game.getBoard());
-                        gamePanel.setTile(game.getTile());
-                        gamePanel.repaint();
+                        boardPanel.setBoard(game.getBoard());
+                        boardPanel.setTile(game.getTile());
+                        boardPanel.repaint();
                     }
 
-                    case GAME -> gamePanel.repaint();
+                    case GAME -> boardPanel.repaint();
 
                     case ROW_COMPLETED -> {
-                        gamePanel.getAnimationPanel().rowCleared(game.getCompleted());
-                        gamePanel.setBoard(game.getBoard());
-                        gamePanel.setTile(game.getTile());
-                        gamePanel.repaint();
+                        boardPanel.getAnimationPanel().rowCleared(game.getCompleted());
+                        boardPanel.setBoard(game.getBoard());
+                        boardPanel.setTile(game.getTile());
+                        boardPanel.repaint();
                     }
                 }
 
             }
 
             case Tetromino tile -> {
-                gamePanel.setTile(tile);
-                gamePanel.repaint();
+                boardPanel.setTile(tile);
+                boardPanel.repaint();
             }
 
             default -> {}
@@ -113,12 +127,12 @@ public class TetrisFrame extends JFrame implements Observer {
 
     @Override
     public synchronized void addKeyListener(KeyListener l) {
-        gamePanel.addKeyListener(l);
+        boardPanel.addKeyListener(l);
     }
 
     public void gameStartClicked() {
         Controller.getInstance().startGame();
-        gamePanel.requestFocusInWindow();
+        boardPanel.requestFocusInWindow();
     }
 
     public void pauseClicked() {
@@ -129,6 +143,6 @@ public class TetrisFrame extends JFrame implements Observer {
     public void endPauseClicked() {
         Tetris.setPaused(false);
         switchScreen(Screen.GAME);
-        gamePanel.requestFocusInWindow();
+        boardPanel.requestFocusInWindow();
     }
 }

@@ -1,5 +1,5 @@
 package view;
 
 public enum Theme {
-    CLASSIC, RETRO, BW, TOKYO_NIGHT, GRUVBOX;
+    CLASSIC, RETRO, BW, TOKYO_NIGHT, GRUVBOX
 }

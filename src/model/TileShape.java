@@ -20,7 +20,7 @@ public enum TileShape {
     public int getSquareSize() { return squareSize; }
     
     public static TileShape getRandomShape(){
-        return switch ((int)(Math.random() * 6)){
+        return switch ((int)(Math.random() * 7)){
             case 0 -> O;
             case 1 -> I;
             case 2 -> S;

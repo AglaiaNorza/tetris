@@ -14,7 +14,6 @@ public class Controller extends Observable implements Observer {
     private static Controller instance;
 
     protected Game game;
-    private TetrisFrame frame;
     private KeyHandler keyH;
 
     private Tetromino tile;

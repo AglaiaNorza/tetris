@@ -1,8 +1,15 @@
 # tetris
 
+### working on:
+- [ ] graphics:
+  - [x] main menu
+  - [ ] rules
+  - [ ] leaderboard
+  - [ ] theme picker
+
 ### to do:
 
-- [ ] graphics (+ tetromino preview)
+- [ ] tetromino preview
 - [x] ~~tetromino ghost (position preview)~~
 - [x] ~~hard drop~~
 - [ ] some game events (pause!!)

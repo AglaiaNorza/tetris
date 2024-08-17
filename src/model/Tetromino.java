@@ -13,7 +13,7 @@ public class Tetromino extends Observable {
     private final TileShape shape;
     private int squareSize;
     private Rotation rotation;
-    public static final int TILE_SIZE = 38;
+    public static final int TILE_SIZE = 36;
     private int[][] repr;
     private int x,y;
 

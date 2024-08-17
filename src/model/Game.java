@@ -77,9 +77,7 @@ public class Game extends Observable implements Observer {
 
         for(int i = 0; i < tetromino.getSquareSize(); i++ ){
             for(int j = 0; j < tetromino.getSquareSize(); j++ ){
-                System.out.println("in the loop");
                 if(tetromino.getRepr()[i][j] != 0){
-                    System.out.println("checking coords, x: " + (j+tX) + " y: " + (i+tY));
                     // trying to move out of bounds
                     if(j+tX < 0 || j+tX > 9 || i+tY > 21) {
                         return true;
@@ -90,14 +88,12 @@ public class Game extends Observable implements Observer {
                 }
             }
         }
-        System.out.println("returning no collision");
         return false;
     }
 
     @Override
     public void update(Observable o, Object arg) {
         if(o instanceof Tetromino) {
-            System.out.println("calling from game update");
             if(arg == GameEvent.BOARD_CHANGE) updateBoard();
             else if(Game.tetrominoCollides(tile, tile.getX(), tile.getY())) updateBoard();
             else {
