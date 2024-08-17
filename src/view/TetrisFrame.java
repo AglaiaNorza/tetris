@@ -125,6 +125,12 @@ public class TetrisFrame extends JFrame implements Observer {
         }
     }
 
+    public void onThemeChange() {
+        panelShower.remove(menuPanel);
+        menuPanel = new MenuPanel();
+        panelShower.add(menuPanel, Screen.MENU.name());
+    }
+
     @Override
     public synchronized void addKeyListener(KeyListener l) {
         boardPanel.addKeyListener(l);
